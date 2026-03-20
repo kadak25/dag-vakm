@@ -1,0 +1,82 @@
+version: '3'
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    container_name: dag_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - dag-observability-net
+
+  grafana:
+    image: grafana/grafana
+    container_name: dag_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - dag-observability-net
+
+  alertmanager:
+    image: prom/alertmanager
+    container_name: dag_alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    networks:
+      - dag-observability-net
+
+  skymap:
+    image: nginx:alpine
+    container_name: dag_skymap
+    ports:
+      - "8888:80"
+    volumes:
+      - ./dag_skymap.html:/usr/share/nginx/html/index.html:ro
+    networks:
+      - dag-observability-net
+
+  recovery:
+    image: python:3.11-slim
+    container_name: dag_recovery
+    working_dir: /app
+    command: >
+      sh -c "pip install flask requests --quiet &&
+             python webhook_server.py"
+    environment:
+      - "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}"
+      - "TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}"
+    volumes:
+      - ./recovery/recovery.py:/app/recovery.py
+      - ./recovery/webhook_server.py:/app/webhook_server.py
+      - ../data:/app/../data
+      - ../logs:/app/../logs
+    ports:
+      - "5001:5001"
+    networks:
+      - dag-observability-net
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  dag-observability-net:
+    driver: bridge

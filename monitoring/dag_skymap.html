@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DAG Sky Map</title>
+  <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+  <style>
+    body { margin: 0; background: #111; font-family: monospace; }
+    #aladin-lite-div { width: 100%; height: 480px; }
+    #info-bar {
+      background: #1a1a2e;
+      color: #00d4ff;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-bottom: 1px solid #00d4ff33;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .badge {
+      background: #00d4ff22;
+      border: 1px solid #00d4ff55;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+    }
+    .badge.active { background: #00ff8822; border-color: #00ff88; color: #00ff88; }
+    #target-list {
+      background: #0d0d1a;
+      color: #ccc;
+      padding: 6px 12px;
+      font-size: 11px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .target-chip {
+      background: #1e1e3a;
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 2px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .target-chip:hover { border-color: #00d4ff; color: #00d4ff; }
+    .target-chip.current { border-color: #00ff88; color: #00ff88; background: #00ff8811; }
+  </style>
+</head>
+<body>
+
+<div id="info-bar">
+  <span>🌌 <b>DAG-VAKM Sky Map</b></span>
+  <span class="badge active">● LIVE</span>
+  <span class="badge" id="current-target">Hedef: —</span>
+  <span class="badge" id="current-coords">RA/DEC: —</span>
+  <span style="margin-left:auto; color:#555; font-size:10px;">Powered by Aladin Lite · CDS Strasbourg</span>
+</div>
+
+<div id="aladin-lite-div"></div>
+
+<div id="target-list" id="targets"></div>
+
+<script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+<script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+<script>
+  // DAG catalog.json hedefleri
+  const targets = [
+    { name: "M42",     ra: 83.822,  dec: -5.391  },
+    { name: "M31",     ra: 10.684,  dec: 41.269  },
+    { name: "NGC2244", ra: 97.5,    dec: 4.9     },
+    { name: "M45",     ra: 56.75,   dec: 24.117  },
+    { name: "M51",     ra: 202.469, dec: 47.195  },
+    { name: "M13",     ra: 250.423, dec: 36.461  },
+    { name: "M81",     ra: 148.888, dec: 69.065  },
+    { name: "M82",     ra: 148.969, dec: 69.679  }
+  ];
+
+  var aladin = A.aladin('#aladin-lite-div', {
+    survey: "P/DSS2/color",
+    fov: 60,
+    target: "M42",
+    showReticle: true,
+    showZoomControl: true,
+    showFullscreenControl: false,
+    showLayersControl: true,
+    showGotoControl: true,
+    showShareControl: false,
+    cooFrame: "J2000",
+    showFrame: true
+  });
+
+  // Hedef marker'ları ekle
+  var cat = A.catalog({ name: "DAG Hedefleri", sourceSize: 18, color: "#00ff88" });
+  aladin.addCatalog(cat);
+
+  targets.forEach(function(t) {
+    cat.addSources([A.source(t.ra, t.dec, { name: t.name, popupTitle: t.name, popupDesc: "RA: " + t.ra + "° / DEC: " + t.dec + "°" })]);
+  });
+
+  // Chip listesi
+  var listDiv = document.getElementById("target-list");
+  targets.forEach(function(t, i) {
+    var chip = document.createElement("span");
+    chip.className = "target-chip" + (i === 0 ? " current" : "");
+    chip.innerText = t.name;
+    chip.onclick = function() {
+      document.querySelectorAll(".target-chip").forEach(function(c) { c.classList.remove("current"); });
+      chip.classList.add("current");
+      aladin.animateToRaDec(t.ra, t.dec, 0.5);
+      aladin.setFov(2);
+      document.getElementById("current-target").innerText = "Hedef: " + t.name;
+      document.getElementById("current-coords").innerText = "RA: " + t.ra.toFixed(2) + "° / DEC: " + t.dec.toFixed(2) + "°";
+    };
+    listDiv.appendChild(chip);
+  });
+
+  // Başlangıçta M42'ye git
+  setTimeout(function() {
+    aladin.animateToRaDec(83.822, -5.391, 0.5);
+    aladin.setFov(3);
+    document.getElementById("current-target").innerText = "Hedef: M42";
+    document.getElementById("current-coords").innerText = "RA: 83.82° / DEC: -5.39°";
+  }, 800);
+</script>
+</body>
+</html>

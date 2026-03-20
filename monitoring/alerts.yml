@@ -1,0 +1,39 @@
+groups:
+  - name: dag_vakm_alerts
+    rules:
+
+      - alert: FITSVeriAkisiDurdu
+        expr: (time() - dag_last_fits_timestamp_seconds) > 2700
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "🔴 DAG Veri Akışı Durdu!"
+          description: "Son FITS dosyası {{ $value | humanizeDuration }} önce geldi. Sistem kontrolü gerekiyor!"
+
+      - alert: DiskKritikSeviye
+        expr: dag_fits_data_bytes_total > 900000000000
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "⚠️ Disk Kritik Seviyede"
+          description: "Toplam veri boyutu 900 GB'ı aştı. Arşivleme gerekiyor."
+
+      - alert: FITSGecersizDosya
+        expr: dag_fits_invalid_total > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "⚠️ Bozuk FITS Dosyası Tespit Edildi"
+          description: "{{ $value }} adet geçersiz/bozuk FITS dosyası var."
+
+      - alert: HavaDurumuKotu
+        expr: dag_weather_condition > 0
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "☁️ Hava Durumu Gözleme Uygun Değil"
+          description: "Hava durumu CLOUDY veya WINDY. Gözlem kalitesi etkilenebilir."

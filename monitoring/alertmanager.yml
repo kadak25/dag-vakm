@@ -1,0 +1,31 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'telegram-and-webhook'
+
+receivers:
+  - name: 'telegram-and-webhook'
+    telegram_configs:
+      - bot_token: 'TELEGRAM_BOT_TOKEN_BURAYA'
+        chat_id: TELEGRAM_CHAT_ID_BURAYA
+        message: |
+          {{ range .Alerts }}
+          {{ .Annotations.summary }}
+          {{ .Annotations.description }}
+          {{ end }}
+        parse_mode: 'HTML'
+    webhook_configs:
+      - url: 'http://dag_recovery:5001/webhook'
+        send_resolved: false
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname']

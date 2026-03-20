@@ -1,0 +1,343 @@
+{
+  "__requires": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "9.0.0" },
+    { "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" },
+    { "type": "panel", "id": "stat", "name": "Stat", "version": "" },
+    { "type": "panel", "id": "timeseries", "name": "Time series", "version": "" },
+    { "type": "panel", "id": "gauge", "name": "Gauge", "version": "" },
+    { "type": "panel", "id": "barchart", "name": "Bar chart", "version": "" },
+    { "type": "panel", "id": "text", "name": "Text", "version": "" }
+  ],
+  "annotations": { "list": [] },
+  "description": "DAG NIR Veri Akışı Kontrol Merkezi v5",
+  "editable": true,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+
+    {
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "options": {
+        "content": "<div style=\"background: linear-gradient(135deg, #0d0d2b 0%, #1a1a4e 50%, #0d0d2b 100%); border: 1px solid #3d59a1; border-radius: 8px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;\">\n  <div style=\"display:flex; align-items:center; gap:16px;\">\n    <span style=\"font-size:42px;\">🔭</span>\n    <div>\n      <div style=\"color:#7aa2f7; font-size:22px; font-weight:bold; letter-spacing:2px; font-family:monospace;\">DAG 4m TELESKOBU</div>\n      <div style=\"color:#565f89; font-size:13px; font-family:monospace; margin-top:2px;\">Doğu Anadolu Gözlemevi · Erzurum · 3170m · NIR Monitoring System</div>\n    </div>\n  </div>\n  <div style=\"text-align:right;\">\n    <div style=\"color:#9ece6a; font-size:13px; font-family:monospace;\">● SYSTEM ONLINE</div>\n    <div style=\"color:#565f89; font-size:11px; font-family:monospace; margin-top:4px;\">DAG-VAKM v5.0 · Prometheus + Grafana</div>\n  </div>\n</div>",
+        "mode": "html"
+      },
+      "title": "",
+      "type": "text",
+      "transparent": true
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 },
+      "id": 200,
+      "title": "🛰️  TELESCOPE STATUS",
+      "type": "row"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "#9ece6a", "value": null },
+            { "color": "#e0af68", "value": 1800 },
+            { "color": "#f7768e", "value": 3600 }
+          ]},
+          "mappings": [
+            { "type": "range", "options": { "from": 0,    "to": 1799, "result": { "text": "✅ OK",      "color": "#9ece6a" } } },
+            { "type": "range", "options": { "from": 1800, "to": 3599, "result": { "text": "⚠️ WARNING", "color": "#e0af68" } } },
+            { "type": "range", "options": { "from": 3600, "to": 1e10, "result": { "text": "🔴 STOPPED", "color": "#f7768e" } } }
+          ],
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 5, "x": 0, "y": 5 },
+      "id": 10,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value_and_name" },
+      "title": "🛰️ Pipeline Status",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "time() - dag_last_fits_timestamp_seconds", "instant": true, "legendFormat": "Pipeline", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "#9ece6a", "value": null },
+            { "color": "#e0af68", "value": 1 },
+            { "color": "#f7768e", "value": 2 }
+          ]},
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "☀️ CLEAR",  "color": "#9ece6a" } } },
+            { "type": "value", "options": { "1": { "text": "☁️ CLOUDY", "color": "#e0af68" } } },
+            { "type": "value", "options": { "2": { "text": "💨 WINDY",  "color": "#ff9e64" } } }
+          ],
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 5, "x": 5, "y": 5 },
+      "id": 30,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "title": "🌤️ Weather Condition",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "dag_weather_condition", "instant": true, "legendFormat": "Weather", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "#9ece6a", "value": null },
+            { "color": "#e0af68", "value": 2.0 },
+            { "color": "#f7768e", "value": 3.0 }
+          ]},
+          "unit": "arcsec", "min": 0, "max": 5
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 10, "y": 5 },
+      "id": 31,
+      "options": { "minVizHeight": 75, "minVizWidth": 75, "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdLabels": true, "showThresholdMarkers": true },
+      "title": "👁️ Atmospheric Seeing",
+      "type": "gauge",
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "dag_weather_seeing_arcsec", "instant": true, "legendFormat": "Seeing", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "#9ece6a", "value": null },
+            { "color": "#e0af68", "value": 30 },
+            { "color": "#f7768e", "value": 60 }
+          ]},
+          "mappings": [],
+          "unit": "m"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 14, "y": 5 },
+      "id": 3,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "title": "⏱️ Last FITS Delay",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "(time() - dag_last_fits_timestamp_seconds) / 60", "instant": true, "legendFormat": "Delay", "refId": "A" }]
+    },
+
+    {
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 5 },
+      "id": 101,
+      "options": {
+        "content": "<div style=\"background:#0d0d2b; border:1px solid #3d59a1; border-radius:8px; padding:12px; height:100%; box-sizing:border-box;\">\n  <div style=\"color:#7aa2f7; font-size:11px; font-family:monospace; margin-bottom:8px; letter-spacing:1px;\">🌙 GECE PENCERESİ</div>\n  <div id='obs-status' style=\"font-size:15px; font-family:monospace; color:#9ece6a;\">Hesaplanıyor...</div>\n  <div style=\"color:#565f89; font-size:10px; font-family:monospace; margin-top:6px;\">Gözlem: 20:00 — 06:00</div>\n  <div style=\"margin-top:10px; border-top:1px solid #3d59a1; padding-top:8px;\">\n    <div style=\"color:#7aa2f7; font-size:11px; font-family:monospace; margin-bottom:4px;\">⏳ SONRAKI PENCERE</div>\n    <div id='next-window' style=\"color:#e0af68; font-size:13px; font-family:monospace;\">Hesaplanıyor...</div>\n  </div>\n</div>\n<script>\nfunction updateObsWindow() {\n  const now = new Date();\n  const h = now.getHours();\n  const m = now.getMinutes();\n  const isNight = h >= 20 || h < 6;\n  const el = document.getElementById('obs-status');\n  const nw = document.getElementById('next-window');\n  if (!el || !nw) return;\n  if (isNight) {\n    el.innerHTML = '✅ AKTİF GÖZLEM';\n    el.style.color = '#9ece6a';\n    let endH = 6, endM = 0;\n    let diff = (endH * 60 + endM) - (h >= 20 ? (h - 24) * 60 + m : h * 60 + m);\n    if (diff < 0) diff += 24 * 60;\n    nw.innerHTML = 'Bitiş: ' + Math.floor(diff/60) + 's ' + (diff%60) + 'dk kaldı';\n  } else {\n    el.innerHTML = '⏸️ GÜNDÜZ MODU';\n    el.style.color = '#e0af68';\n    let startH = 20, startM = 0;\n    let diff = (startH * 60 + startM) - (h * 60 + m);\n    if (diff < 0) diff += 24 * 60;\n    nw.innerHTML = 'Başlangıç: ' + Math.floor(diff/60) + 's ' + (diff%60) + 'dk sonra';\n  }\n}\nupdateObsWindow();\nsetInterval(updateObsWindow, 10000);\n</script>",
+        "mode": "html"
+      },
+      "title": "🌙 Gözlem Penceresi",
+      "type": "text",
+      "transparent": false
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
+      "id": 201,
+      "title": "📡  DATA PIPELINE",
+      "type": "row"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "#7aa2f7", "mode": "fixed" },
+          "custom": { "drawStyle": "line", "fillOpacity": 25, "gradientMode": "opacity", "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 4, "showPoints": "auto", "spanNulls": false },
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#7aa2f7", "value": null }] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Son 1 Saatte Artan Dosya" }, "properties": [{ "id": "color", "value": { "fixedColor": "#9ece6a", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 12 },
+      "id": 11,
+      "options": { "legend": { "calcs": ["mean","max"], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single" } },
+      "title": "☄️ FITS Ingestion Rate",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(dag_fits_files_total[5m])", "legendFormat": "Ingestion Rate (5m)", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "increase(dag_fits_files_total[1h])", "legendFormat": "Son 1 Saatte Artan Dosya", "refId": "B" }
+      ]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "#bb9af7", "mode": "fixed" },
+          "custom": { "drawStyle": "line", "fillOpacity": 25, "gradientMode": "opacity", "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 4, "showPoints": "auto", "spanNulls": false },
+          "unit": "Bps",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#bb9af7", "value": null }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 12 },
+      "id": 12,
+      "options": { "legend": { "calcs": ["mean","max"], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single" } },
+      "title": "💾 Storage Growth Rate",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(dag_fits_data_bytes_total[5m])", "legendFormat": "Storage Growth (5m)", "refId": "A" }
+      ]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "#f7768e", "mode": "fixed" },
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "gradientMode": "opacity", "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 4, "showPoints": "auto", "spanNulls": false, "thresholdsStyle": { "mode": "line+area" } },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "transparent", "value": null }, { "color": "#f7768e", "value": 45 } ] },
+          "unit": "m"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 12 },
+      "id": 7,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single" } },
+      "title": "⚠️ Veri Akış Gecikmesi (45dk Alarm)",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "(time() - dag_last_fits_timestamp_seconds) / 60", "legendFormat": "Gecikme (dk)", "refId": "A" }
+      ]
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
+      "id": 202,
+      "title": "🔭  OBSERVATION DATA",
+      "type": "row"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#9ece6a", "value": null }, { "color": "#e0af68", "value": 50 }, { "color": "#f7768e", "value": 100 }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 21 },
+      "id": 1,
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "title": "🔭 FITS Dosya Sayısı",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "dag_fits_files_total", "instant": true, "legendFormat": "Dosya", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#9ece6a", "value": null }, { "color": "#e0af68", "value": 1 }, { "color": "#f7768e", "value": 5 }] },
+          "unit": "short"
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Geçersiz" }, "properties": [{ "id": "color", "value": { "fixedColor": "#f7768e", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Geçerli" },  "properties": [{ "id": "color", "value": { "fixedColor": "#9ece6a", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 21 },
+      "id": 13,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "title": "🧬 FITS Validasyon",
+      "type": "stat",
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "dag_fits_valid_total",   "instant": true, "legendFormat": "Geçerli",  "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "dag_fits_invalid_total", "instant": true, "legendFormat": "Geçersiz", "refId": "B" }
+      ]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#7aa2f7", "value": null }] },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 21 },
+      "id": 2,
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
+      "title": "💾 Toplam Veri",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "dag_fits_data_bytes_total", "instant": true, "legendFormat": "Boyut", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 80, "gradientMode": "none", "lineWidth": 1 },
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#7aa2f7", "value": null }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 21 },
+      "id": 40,
+      "options": { "barRadius": 0.1, "barWidth": 0.7, "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "orientation": "horizontal", "showValue": "always", "stacking": "none", "tooltip": { "mode": "single" } },
+      "title": "🌟 Top Observed Targets",
+      "type": "barchart",
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "dag_target_observation_total", "instant": true, "legendFormat": "{{object}}", "refId": "A" }]
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "id": 203,
+      "title": "🌌  SKY MAP",
+      "type": "row"
+    },
+
+    {
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 32 },
+      "id": 20,
+      "options": {
+        "content": "<iframe src=\"http://localhost:8888\" width=\"100%\" height=\"520\" frameborder=\"0\" style=\"border-radius:8px; border:1px solid #3d59a1;\"></iframe>",
+        "mode": "html"
+      },
+      "title": "🌌 Sky Map — Gözlem Hedefleri (Aladin Lite)",
+      "type": "text",
+      "transparent": false
+    }
+
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["dag", "fits", "astronomi", "v5"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "DAG-VAKM | NIR Veri Akışı Kontrol Merkezi",
+  "uid": "dag-vakm-v5",
+  "version": 5
+}
